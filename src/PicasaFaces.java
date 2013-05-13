@@ -177,7 +177,7 @@ public class PicasaFaces {
 		StringBuilder csv = new StringBuilder("person;prefix;filename;original image path;transformed image path;image width;image height;face x;face y;face width;face height\n");
 		for(String person:personFaces.keySet()){
 			File folderPerson = new File(output+person);
-			if(!folderPerson.exists()){
+			if(convert && !folderPerson.exists()){
 				folderPerson.mkdir();
 			}
 			
