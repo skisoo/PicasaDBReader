@@ -56,7 +56,7 @@ public class PicasaFaces {
     	options.addOption(OptionBuilder.withArgName("replaceRegex").hasArg().withDescription("regex to change original image path if needed").create("replaceRegex"));
     	options.addOption(OptionBuilder.withArgName("replacement").hasArg().withDescription("replacement for the regex").create("replacement"));
     	options.addOption(new Option("prefix", "add prefix to generated face images"));
-    	options.addOption(new Option("convert", "use 'convert' from imagemagick to create face images in the %output%/%personName% folder"));
+    	options.addOption(OptionBuilder.withArgName("convert").hasArg().withDescription("path of convert from imagemagick (including convert itself)").create("convert"));
     	
     	CommandLineParser parser = new GnuParser();
     	String folder=null;
@@ -64,7 +64,7 @@ public class PicasaFaces {
     	String regex=null;
     	String replacement=null;
     	boolean prefix =false;
-    	boolean convert = false;
+    	String convert = null;
         try {
             // parse the command line arguments
             CommandLine line = parser.parse( options, args );
@@ -88,7 +88,7 @@ public class PicasaFaces {
                 	output += File.separator;
                 }
             	if(! new File(output).exists()){
-            		throw new Exception("output folder does not exist:"+output);
+            		new File(output).mkdir();
             	}
             }
             if(line.hasOption("replaceRegex") && !line.hasOption("replacement")){
@@ -105,7 +105,7 @@ public class PicasaFaces {
             	prefix=true;
             }
             if(line.hasOption("convert")){
-            	convert=true;
+            	convert=line.getOptionValue("convert");
             }
         }
         catch( ParseException exp ) {
@@ -173,11 +173,11 @@ public class PicasaFaces {
 		}
 	}
 	
-	public void processImages(String regex, String replacement, String output, boolean prefix, boolean convert) throws IOException, InterruptedException{
+	public void processImages(String regex, String replacement, String output, boolean prefix, String convert) throws IOException, InterruptedException{
 		StringBuilder csv = new StringBuilder("person;prefix;filename;original image path;transformed image path;image width;image height;face x;face y;face width;face height\n");
 		for(String person:personFaces.keySet()){
 			File folderPerson = new File(output+person);
-			if(convert && !folderPerson.exists()){
+			if(convert!=null && !folderPerson.exists()){
 				folderPerson.mkdir();
 			}
 			
@@ -190,13 +190,17 @@ public class PicasaFaces {
 				}
 				int x=f.x;
 				int y=f.y;
-				String [] file = path.split(File.separator);
+				String separator = File.separator;
+				if(separator.equals("\\")){
+					separator="\\\\";
+				}
+				String [] file = path.split(separator);
 				String prefixStr = "";
 				if(prefix){
 					prefixStr = ""+ i +"_";
 				}
 				String filename = output + person + File.separator + prefixStr+file[file.length-1];
-				if(new File(filename).exists()){
+				if(convert!=null && new File(filename).exists()){
 					System.out.println("Warning, the filename already exist: "+person + File.separator + prefixStr+file[file.length-1]);
 				}
 				csv.append(person);
@@ -226,9 +230,13 @@ public class PicasaFaces {
 				csv.append(f.h);
 				csv.append("\n");
 				
-				if(convert){
-					String [] cmd = {"convert",path, "-crop", f.w+"x"+f.h+"+"+x+"+"+y, filename};
+				if(convert!=null){
 					
+					if(File.separator.equals("\\")){
+						path = "\""+path+"\"";
+						filename = "\""+filename+"\"";
+					}
+					String []cmd = {convert,path, "-crop", f.w+"x"+f.h+"+"+x+"+"+y, filename};
 					Process p = Runtime.getRuntime().exec(cmd);
 					p.waitFor();
 				}
