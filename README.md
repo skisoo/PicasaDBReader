@@ -6,6 +6,10 @@ There are 2 simple programs:
 * PMPDB
 * PicasaFaces
 
+Dependencies:
+* commons cli: http://commons.apache.org/proper/commons-cli/download_cli.cgi
+* commons io: http://commons.apache.org/proper/commons-io/download_io.cgi
+
 ## PMPDB
 PMPDB read all the PMP files containing the Picasa Database and the file containing indexes thumbindex.db. This program
 will create 3 csv files: albumdata.csv (album database), catdata.csv (category database), imagedata.csv (picture database).
