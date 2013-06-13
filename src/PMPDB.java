@@ -19,6 +19,16 @@ import org.apache.commons.cli.ParseException;
 
 
 public class PMPDB {
+	private static final String PARAM_OUTPUT_FOLDER = "output";
+
+	private static final String PARAM_PICASA_DB_FOLDER = "folder";
+
+	private static final String APPTITLE = "PMPDB";
+
+	private static final String HELP = "read all the PMP files containing the Picasa Database and the file " +
+	                		"containing indexes thumbindex.db. \nThis program will create 3 csv files: albumdata.csv " +
+	                		"(album database), catdata.csv (category database), imagedata.csv (picture database).\n\nParameters:\n";
+	
 	HashMap<String, ArrayList<String>> catdata;
 	HashMap<String, ArrayList<String>> albumdata;
 	HashMap<String, ArrayList<String>> imagedata;
@@ -35,11 +45,11 @@ public class PMPDB {
 		catdata = getTable("catdata");
 		albumdata = getTable("albumdata");
 		imagedata = getTable("imagedata");
-		ArrayList<String> is = new ArrayList<>();
+		ArrayList<String> is = new ArrayList<String>();
 		for(Long l:indexes.indexes){
 			is.add(l.toString());
 		}
-		ArrayList<String> ois = new ArrayList<>();
+		ArrayList<String> ois = new ArrayList<String>();
 		for(Long l:indexes.originalIndexes){
 			ois.add(l.toString());
 		}
@@ -61,7 +71,7 @@ public class PMPDB {
         };
         
         File[] files = new File(folder).listFiles(filter);
-        HashMap<String, ArrayList<String>> data = new HashMap<>();
+        HashMap<String, ArrayList<String>> data = new HashMap<String, ArrayList<String>>();
         
         for(int i=0; i<files.length; i++){
             String filename 	= files[i].getName();
@@ -181,8 +191,8 @@ public class PMPDB {
 	public static void main(String[] args) throws Exception {
 		Options options = new Options();
     	options.addOption("h","help", false, "prints the help content");
-    	options.addOption(OptionBuilder.withArgName("srcFolder").hasArg().isRequired().withDescription("Picasa DB folder").create("folder"));
-    	options.addOption(OptionBuilder.withArgName("outputFolder").hasArg().isRequired().withDescription("output folder").create("output"));
+    	options.addOption(OptionBuilder.withArgName("srcFolder").hasArg().withDescription("Picasa DB folder. Default is " + EnvironmentVariables.DEFAULT_PICASA_DB_PATH).create(PARAM_PICASA_DB_FOLDER));
+    	options.addOption(OptionBuilder.withArgName("outputFolder").hasArg().isRequired().withDescription("output folder").create(PARAM_OUTPUT_FOLDER));
     	
     	CommandLineParser parser = new GnuParser();
     	String folder=null;
@@ -191,21 +201,14 @@ public class PMPDB {
             // parse the command line arguments
             CommandLine line = parser.parse( options, args );
             if(line.hasOption("h")){
-            	HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp( "CreateCSVs" , options );
+            	showHelp(options);
                 System.exit(1);
             }
-            if(line.hasOption("folder")){
-            	folder = line.getOptionValue("folder");
-                if(!folder.endsWith(File.separator)){
-                	folder += File.separator;
-                }
-            	if(! new File(folder).exists()){
-            		throw new Exception("Source folder does not exist:"+folder);
-            	}
-            }
-            if(line.hasOption("output")){
-            	output = line.getOptionValue("output");
+            
+            folder = EnvironmentVariables.getPicasaDBFolder(line, PARAM_PICASA_DB_FOLDER);
+
+            if(line.hasOption(PARAM_OUTPUT_FOLDER)){
+            	output = EnvironmentVariables.expandEnvVars(line.getOptionValue(PARAM_OUTPUT_FOLDER));
                 if(!output.endsWith(File.separator)){
                 	output += File.separator;
                 }
@@ -218,13 +221,19 @@ public class PMPDB {
             // oops, something went wrong
         	
             System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "CreateCSVs" , options );
+            showHelp(options);
             System.exit(1);
         }
         
         PMPDB db = new PMPDB(folder);
         db.populate();
         db.writeCSVs(output);
+	}
+
+	private static void showHelp(Options options) {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp(APPTITLE, 
+				HELP, 
+				options, "\n", true);
 	}
 }

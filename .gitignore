@@ -4,3 +4,11 @@
 *.jar
 *.war
 *.ear
+/Download
+/export
+/lib
+/bin
+
+/.classpath
+/.project
+/.settings
