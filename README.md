@@ -30,3 +30,6 @@ Usage:
 java -classpath ".:bin/:commons-cli-1.2.jar:commons-io-2.4.jar" PicasaFaces -folder "/path/to/PicasaDB/Picasa2/db3/" -output ./OutputFolder -replaceRegex C: -replacement /media/HardDrive -convert /path/to/convert(.exe)
 ```
 
+update k3b 2013-06-13:
+Added support for picasaDB defaultlocation
+
