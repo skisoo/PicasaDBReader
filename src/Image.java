@@ -15,7 +15,7 @@ public class Image {
 		this.index=index;
 		this.h=h;
 		this.w=w;
-		faces = new ArrayList<>();
+		faces = new ArrayList<Face>();
 	}
 	
 	public Face addFace(String facerect, String person){

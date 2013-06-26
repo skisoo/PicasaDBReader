@@ -17,6 +17,8 @@ import org.apache.commons.io.FilenameUtils;
 
 
 public class PicasaFaces {
+	private static final String PARAM_OUTPUT_FOLDER = "output";
+	private static final String PARAM_PICASA_DB_FOLDER = "folder";
 	PMPDB db;
 	HashMap<String, String> personsId;
 	HashMap<String, ArrayList<Face>> personFaces;
@@ -24,9 +26,9 @@ public class PicasaFaces {
 
 	public PicasaFaces(String folder) {
 		db = new PMPDB(folder);
-		personsId = new HashMap<>();
-		personFaces = new HashMap<>();
-		images = new HashMap<>();
+		personsId = new HashMap<String, String>();
+		personFaces = new HashMap<String, ArrayList<Face>>();
+		images = new HashMap<Long, Image>();
 	}
 	
 	public void populate() throws Exception{
@@ -51,8 +53,8 @@ public class PicasaFaces {
 	public static void main(String[] args) throws Exception {
 		Options options = new Options();
     	options.addOption("h","help", false, "print the help content");
-    	options.addOption(OptionBuilder.withArgName("srcFolder").hasArg().isRequired().withDescription("Picasa DB folder").create("folder"));
-    	options.addOption(OptionBuilder.withArgName("outputFolder").hasArg().isRequired().withDescription("output folder").create("output"));
+    	options.addOption(OptionBuilder.withArgName("srcFolder").hasArg().withDescription("Picasa DB folder. Default is " + EnvironmentVariables.DEFAULT_PICASA_DB_PATH).create(PARAM_PICASA_DB_FOLDER));
+    	options.addOption(OptionBuilder.withArgName("outputFolder").hasArg().isRequired().withDescription("output folder").create(PARAM_OUTPUT_FOLDER));
     	options.addOption(OptionBuilder.withArgName("replaceRegex").hasArg().withDescription("regex to change original image path if needed").create("replaceRegex"));
     	options.addOption(OptionBuilder.withArgName("replacement").hasArg().withDescription("replacement for the regex").create("replacement"));
     	options.addOption(new Option("prefix", "add prefix to generated face images"));
@@ -69,21 +71,14 @@ public class PicasaFaces {
             // parse the command line arguments
             CommandLine line = parser.parse( options, args );
             if(line.hasOption("h")){
-            	HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp( "PicasaFaces" , options );
+            	showHelp(options);
                 System.exit(1);
             }
-            if(line.hasOption("folder")){
-            	folder = line.getOptionValue("folder");
-                if(!folder.endsWith(File.separator)){
-                	folder += File.separator;
-                }
-            	if(! new File(folder).exists()){
-            		throw new Exception("Source folder does not exist:"+folder);
-            	}
-            }
-            if(line.hasOption("output")){
-            	output = line.getOptionValue("output");
+            
+            folder = EnvironmentVariables.getPicasaDBFolder(line, PARAM_PICASA_DB_FOLDER);
+
+        	if(line.hasOption(PARAM_OUTPUT_FOLDER)){
+            	output = EnvironmentVariables.expandEnvVars(line.getOptionValue(PARAM_OUTPUT_FOLDER));
                 if(!output.endsWith(File.separator)){
                 	output += File.separator;
                 }
@@ -105,15 +100,14 @@ public class PicasaFaces {
             	prefix=true;
             }
             if(line.hasOption("convert")){
-            	convert=line.getOptionValue("convert");
+            	convert=EnvironmentVariables.expandEnvVars(line.getOptionValue("convert"));
             }
         }
         catch( ParseException exp ) {
             // oops, something went wrong
         	
             System.err.println( "Parsing failed.  Reason: " + exp.getMessage() );
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "PicasaFaces" , options );
+            showHelp(options);
             System.exit(1);
         }
         
@@ -123,6 +117,15 @@ public class PicasaFaces {
         faces.gatherImages();
         faces.processImages(regex, replacement, output, prefix, convert);
 
+	}
+
+	private static void showHelp(Options options) {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp("PicasaFaces will extract the face information from the Picasa Database and save it in a csv file. " +
+				"If the command line contains the argument '-convert' followed by the path to convert, " +
+				"then imagemagick will create all the face thumbshots (in the output folder with a folder for each person). " +
+				"A string replacement of the image paths can be done if the pictures location is different from the database.", 
+				"PicasaFaces" , options , "", true);
 	}
 	
 	public void gatherImages(){

@@ -16,6 +16,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class Indexes {
+	private static final String PARAM_OUTPUT_FOLDER = "output";
+
+	private static final String PARAM_PICASA_DB_FOLDER = "folder";
+
 	//will store the name of the folders or the name of the image file (the index in the list will be the correct index of the image file)
     ArrayList<String> names;  
     
@@ -27,9 +31,9 @@ public class Indexes {
     long entries;
     
     public Indexes(String folder) {
-    	names = new ArrayList<>();  
-        indexes = new ArrayList<>();
-        originalIndexes = new ArrayList<>();
+    	names = new ArrayList<String>();  
+        indexes = new ArrayList<Long>();
+        originalIndexes = new ArrayList<Long>();
         this.folder = folder;
 	}
     
@@ -91,8 +95,8 @@ public class Indexes {
 	public static void main(String []args) throws Exception{
     	Options options = new Options();
     	options.addOption("h","help", false, "prints the help content");
-    	options.addOption(OptionBuilder.withArgName("srcFolder").hasArg().isRequired().withDescription("Picasa DB folder").create("folder"));
-    	options.addOption(OptionBuilder.withArgName("outputFolder").hasArg().isRequired().withDescription("output folder").create("output"));
+    	options.addOption(OptionBuilder.withArgName("srcFolder").hasArg().withDescription("Picasa DB folder. Default is " + EnvironmentVariables.DEFAULT_PICASA_DB_PATH).create(PARAM_PICASA_DB_FOLDER));
+    	options.addOption(OptionBuilder.withArgName("outputFolder").hasArg().isRequired().withDescription("output folder").create(PARAM_OUTPUT_FOLDER));
     	
     	CommandLineParser parser = new GnuParser();
     	String folder=null;
@@ -105,17 +109,11 @@ public class Indexes {
                 formatter.printHelp( "ReadThumbs" , options );
                 System.exit(1);
             }
-            if(line.hasOption("folder")){
-            	folder = line.getOptionValue("folder");
-                if(!folder.endsWith(File.separator)){
-                	folder += File.separator;
-                }
-            	if(! new File(folder).exists()){
-            		throw new Exception("Source folder does not exist:"+folder);
-            	}
-            }
-            if(line.hasOption("output")){
-            	output = line.getOptionValue("output");
+            
+            folder = EnvironmentVariables.getPicasaDBFolder(line, PARAM_PICASA_DB_FOLDER);
+
+            if(line.hasOption(PARAM_OUTPUT_FOLDER)){
+            	output = EnvironmentVariables.expandEnvVars(line.getOptionValue(PARAM_OUTPUT_FOLDER));
                 if(!output.endsWith(File.separator)){
                 	output += File.separator;
                 }
