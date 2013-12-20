@@ -9,6 +9,12 @@ There are 2 simple programs:
 Dependencies:
 * commons cli: http://commons.apache.org/proper/commons-cli/download_cli.cgi
 * commons io: http://commons.apache.org/proper/commons-io/download_io.cgi
+ 
+## Compilation
+Download commons-io-2.4.jar and commons-cli-1.2.jar and place them in the base directory. Create a folder "bin" in the base directory and run:
+```bash
+javac -d bin/ -cp .:commons-cli-1.2.jar:commons-io-2.4.jar src/EnvironmentVariables.java  src/Face.java  src/Image.java  src/Indexes.java  src/PicasaFaces.java  src/PMPDB.java  src/ReadFunctions.java
+```
 
 ## PMPDB
 PMPDB read all the PMP files containing the Picasa Database and the file containing indexes thumbindex.db. This program
