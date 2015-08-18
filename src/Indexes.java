@@ -57,7 +57,7 @@ public class Indexes {
             
             
             names.add(path);
-            indexes.add(index);
+            indexes.add((long)i);
             originalIndexes.add(index);
             
             
