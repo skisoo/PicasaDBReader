@@ -9,7 +9,9 @@
 /lib
 /bin
 
+/*.iml
 /.classpath
 /.gradle
+/.idea
 /.project
 /.settings
