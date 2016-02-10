@@ -6,14 +6,15 @@ There are 2 simple programs:
 * PMPDB
 * PicasaFaces
 
-Dependencies:
-* commons cli: http://commons.apache.org/proper/commons-cli/download_cli.cgi
-* commons io: http://commons.apache.org/proper/commons-io/download_io.cgi
- 
+## Build dependencies
+
+* A Java compiler
+* [Gradle](http://gradle.org/)
+
 ## Compilation
-Download commons-io-2.4.jar and commons-cli-1.2.jar and place them in the base directory. Create a folder "bin" in the base directory and run:
+
 ```bash
-javac -d bin/ -cp .:commons-cli-1.2.jar:commons-io-2.4.jar src/EnvironmentVariables.java  src/Face.java  src/Image.java  src/Indexes.java  src/PicasaFaces.java  src/PMPDB.java  src/ReadFunctions.java
+gradle installDist
 ```
 
 ## PMPDB
@@ -22,7 +23,7 @@ will create 3 csv files: albumdata.csv (album database), catdata.csv (category d
 
 Usage:
 ```bash
-java -classpath ".:bin/:commons-cli-1.2.jar" PMPDB -folder "/path/to/PicasaDB/Picasa2/db3/" -output ./OutputFolder
+./build/install/PMPDB/bin/PMPDB -folder "/path/to/PicasaDB/Picasa2/db3/" -output ./OutputFolder
 ```
 
 ## PicasaFaces
@@ -33,8 +34,10 @@ can be done if the pictures location is different from the database.
 
 Usage:
 ```bash
-java -classpath ".:bin/:commons-cli-1.2.jar:commons-io-2.4.jar" PicasaFaces -folder "/path/to/PicasaDB/Picasa2/db3/" -output ./OutputFolder -replaceRegex C: -replacement /media/HardDrive -convert /path/to/convert(.exe)
+./build/install/PMPDB/bin/PicasaFaces -folder "/path/to/PicasaDB/Picasa2/db3/" -output ./OutputFolder -replaceRegex C: -replacement /media/HardDrive -convert /path/to/convert(.exe)
 ```
+
+## Changelog
 
 update k3b 2013-06-13:
 Added support for picasaDB defaultlocation
