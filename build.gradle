@@ -21,3 +21,5 @@ task picasaFacesScripts(type: CreateStartScripts) {
     outputDir = new File(project.buildDir, 'scripts')
     classpath = jar.outputs.files + project.configurations.runtime
 }
+
+startScripts.dependsOn picasaFacesScripts
