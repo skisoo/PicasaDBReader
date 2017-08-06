@@ -1,3 +1,5 @@
+package be.thebaseline.kmoens.PicasaDBReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -49,7 +51,7 @@ public class PicasaFaces {
 		}
 	}
 	
-	@SuppressWarnings("static-access")
+	@SuppressWarnings({ "static-access", "deprecation" })
 	public static void main(String[] args) throws Exception {
 		Options options = new Options();
     	options.addOption("h","help", false, "print the help content");

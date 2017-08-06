@@ -1,3 +1,6 @@
+package be.thebaseline.kmoens.PicasaDBReader;
+
+
 
 public class Face {
 	int x;

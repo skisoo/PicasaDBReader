@@ -1,3 +1,7 @@
+package be.thebaseline.kmoens.PicasaDBReader;
+
+
+
 import java.util.ArrayList;
 
 
