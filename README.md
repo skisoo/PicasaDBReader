@@ -34,7 +34,8 @@ can be done if the pictures location is different from the database.
 
 Usage:
 ```bash
-./build/install/PMPDB/bin/PicasaFaces -folder "/path/to/PicasaDB/Picasa2/db3/" -output ./OutputFolder -replaceRegex C: -replacement /media/HardDrive -convert /path/to/convert(.exe)
+./build/install/PMPDB/bin/PicasaFaces -folder "D:/Sandbox/98. Picasa/Google/Picasa2/db3" -output "D:\dev_home\source\be\thebaseline\projects\picture-processor\src\main\resources"
+
 ```
 
 ## Changelog

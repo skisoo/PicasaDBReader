@@ -1,3 +1,6 @@
+package be.thebaseline.kmoens.PicasaDBReader;
+
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;

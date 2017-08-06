@@ -1,3 +1,5 @@
+package be.thebaseline.kmoens.PicasaDBReader;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -49,7 +51,7 @@ public class PicasaFaces {
 		}
 	}
 	
-	@SuppressWarnings("static-access")
+	@SuppressWarnings({ "static-access", "deprecation" })
 	public static void main(String[] args) throws Exception {
 		Options options = new Options();
     	options.addOption("h","help", false, "print the help content");
@@ -133,7 +135,7 @@ public class PicasaFaces {
 		
 		
 		for(int i=0; i<nb; i++){
-			
+		try {	
 			if(db.indexes.indexes.get(i).compareTo(db.indexes.folderIndex)!=0){ // not a folder
 				String path = db.indexes.names.get(new Long(db.indexes.indexes.get(i)).intValue()) + db.indexes.names.get(i);
 				int w = Integer.parseInt(db.imagedata.get("width").get(i));
@@ -174,10 +176,13 @@ public class PicasaFaces {
             	}// else folder
             }
 		}
+		catch (Exception ex) 
+		{}
+		}
 	}
 	
 	public void processImages(String regex, String replacement, String output, boolean prefix, String convert) throws IOException, InterruptedException{
-		StringBuilder csv = new StringBuilder("person;prefix;filename;original image path;transformed image path;image width;image height;face x;face y;face width;face height\n");
+		StringBuilder csv = new StringBuilder("person;prefix;filename;original image path;transformed image path;image width;image height;face x;face y;face width;face height,region_x,region_y,region_w,region_h\n");
 		for(String person:personFaces.keySet()){
 			File folderPerson = new File(output+person);
 			if(convert!=null && !folderPerson.exists()){
@@ -231,6 +236,14 @@ public class PicasaFaces {
 				csv.append(f.w);
 				csv.append(";");
 				csv.append(f.h);
+				csv.append(";");
+				csv.append(f.region_x);
+				csv.append(";");
+				csv.append(f.region_y);
+				csv.append(";");
+				csv.append(f.region_w);
+				csv.append(";");
+				csv.append(f.region_h);
 				csv.append("\n");
 				
 				if(convert!=null){
